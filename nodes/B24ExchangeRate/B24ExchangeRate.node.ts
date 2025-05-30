@@ -4,26 +4,33 @@ import type {
 } from 'n8n-workflow';
 import { NodeConnectionType } from 'n8n-workflow';
 
-export class B24CryptoManager implements INodeType {
+export class B24ExchangeRate implements INodeType {
 	description: INodeTypeDescription = {
-		displayName: 'B24 Crypto Manager',
+		displayName: 'B24 Exchange Rate',
+		name: 'b24ExchangeRate',
 		icon: 'file:b24Logo.svg',
-		name: 'b24CryptoManager',
 		group: ['input'],
 		version: 1,
 		subtitle: '={{$parameter["operation"] + ": " + $parameter["currency"]}}',
-		description: 'Basic B24 Crypto Manager',
+		description: 'Basic B24 Exchange Rate',
 		defaults: {
-			name: 'B24 Crypto Manager',
+			name: 'B24 Exchange Rate',
 		},
 		inputs: [NodeConnectionType.Main],
 		outputs: [NodeConnectionType.Main],
+		credentials: [
+			{
+				name: 'b24ExchangeRateApi',
+				required: true,
+			},
+		],
 		usableAsTool: true,
 		requestDefaults: {
-			baseURL: 'https://api.binance.com/api/v3',
+			baseURL: 'https://v6.exchangerate-api.com/v6',
 			headers: {
 				Accept: 'application/json',
 				'Content-Type': 'application/json',
+				Authorization: '=Bearer {{$credentials.apiKey}}',
 			},
 		},
 		properties: [
@@ -34,11 +41,11 @@ export class B24CryptoManager implements INodeType {
 				noDataExpression: true,
 				options: [
 					{
-						name: 'Coin',
-						value: 'coin',
+						name: 'Rate',
+						value: 'rate',
 					}
 				],
-				default: 'coin',
+				default: 'rate',
 			},
 			{
 				displayName: 'Operation',
@@ -47,34 +54,34 @@ export class B24CryptoManager implements INodeType {
 				noDataExpression: true,
 				displayOptions: {
 					show: {
-						resource: ['coin'],
+						resource: ['rate'],
 					},
 				},
 				options: [
 					{
-						name: 'Get Symbol Price',
-						value: 'getSymbolPrice',
-						description: 'Get price for a specific symbol',
-						action: 'Get price for a specific symbol',
+						name: 'Get Exchange Rate',
+						value: 'getExchangeRate',
+						description: 'Get the exchange rate',
+						action: 'Get exchange rate',
 						routing: {
 							request: {
 								method: 'GET',
-								url: '=/ticker/price?symbol={{$parameter["symbol"]}}',
+								url: '=/latest/{{$parameter["currency"]}}',
 							},
 						},
 					},
 				],
-				default: 'getSymbolPrice',
+				default: 'getExchangeRate',
 			},
 			{
-				displayName: 'Symbol',
-				name: 'symbol',
+				displayName: 'Currency',
+				name: 'currency',
 				type: 'string',
-				default: 'BTCUSDT',
-				description: 'The trading pair symbol (e.g., BTCUSDT, ETHUSDT)',
+				default: 'USD',
+				description: 'The trading pair currency (e.g., EUR, GBP, AED, etc.)',
 				displayOptions: {
 					show: {
-						resource: ['coin'],
+						resource: ['rate'],
 					},
 				},
 			},
