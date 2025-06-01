@@ -7,6 +7,7 @@ package manager for n8n custom nodes
 
 ```
 npm install -g pnpm
+npm install -g rimraf
 ```
 
 
